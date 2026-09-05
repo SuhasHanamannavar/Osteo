@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OsteoDetect - Early Osteoarthritis Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'heading': ['Sora', 'sans-serif'],
+                        'body': ['IBM Plex Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        cream: '#FAF7F2',
+                        warm: '#F5EFE6',
+                        forest: '#2D5A3D',
+                        forestLight: '#3D7A52',
+                        terracotta: '#C4643A',
+                        terracottaLight: '#D9855A',
+                        sand: '#E8DCC8',
+                        charcoal: '#1A1A1A',
+                        muted: '#6B6B6B',
+                    },
+                    animation: {
+                        'fade-up': 'fadeUp 0.8s ease forwards',
+                        'fade-in': 'fadeIn 1s ease forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeUp: {
+                            '0%': { opacity: '0', transform: 'translateY(40px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: #FAF7F2;
+            color: #1A1A1A;
+            overflow-x: hidden;
+        }
+
+        .font-heading {
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .reveal-left.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(60px);
+            transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .reveal-right.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.85);
+            transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .reveal-scale.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Hero gradient orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: #C4643A;
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: #2D5A3D;
+            bottom: -50px;
+            left: -50px;
+            animation-delay: 2s;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: #D9855A;
+            top: 50%;
+            left: 30%;
+            animation-delay: 4s;
+        }
+
+        /* Card hover effects */
+        .pillar-card {
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pillar-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2D5A3D, #C4643A);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+
+        .pillar-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 30px 60px -15px rgba(45, 90, 61, 0.2);
+        }
+
+        /* Navbar */
+        .navbar {
+            transition: all 0.4s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(250, 247, 242, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #2D5A3D, #3D7A52);
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px -10px rgba(45, 90, 61, 0.4);
+        }
+
+        .btn-secondary {
+            border: 2px solid #2D5A3D;
+            color: #2D5A3D;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #2D5A3D;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Progress bar animation */
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2D5A3D, #C4643A);
+            border-radius: 4px;
+            width: 0;
+            transition: width 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .progress-fill.animate {
+            width: var(--progress);
+        }
+
+        /* Status indicator */
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-green {
+            background: #2D5A3D;
+            box-shadow: 0 0 15px rgba(45, 90, 61, 0.5);
+        }
+
+        .status-yellow {
+            background: #D4A017;
+            box-shadow: 0 0 15px rgba(212, 160, 23, 0.5);
+        }
+
+        .status-red {
+            background: #C4643A;
+            box-shadow: 0 0 15px rgba(196, 100, 58, 0.5);
+        }
+
+        /* How it works connector */
+        .connector-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #2D5A3D, #C4643A);
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Number counter */
+        .stat-number {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        /* Decorative grain texture */
+        .grain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* Section divider */
+        .section-divider {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #2D5A3D, #C4643A);
+            border-radius: 2px;
+        }
+
+        /* Feature list checkmark */
+        .check-item::before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            background: #2D5A3D;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 6L5 9L10 3' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(5deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar fixed top-0 left-0 right-0 z-50 py-4 px-6 lg:px-12">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-forest to-terracotta flex items-center justify-center">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </div>
+                <span class="font-heading font-bold text-xl text-charcoal">OsteoDetect</span>
+            </a>
+            
+            <div class="hidden lg:flex items-center gap-10">
+                <a href="#problem" class="text-charcoal/80 hover:text-forest transition-colors font-medium">Problem</a>
+                <a href="#pillars" class="text-charcoal/80 hover:text-forest transition-colors font-medium">Solution</a>
+                <a href="#how-it-works" class="text-charcoal/80 hover:text-forest transition-colors font-medium">How It Works</a>
+                <a href="#impact" class="text-charcoal/80 hover:text-forest transition-colors font-medium">Impact</a>
+                <a href="#contact" class="btn-primary px-6 py-2.5 rounded-full font-semibold text-sm">Get Started</a>
+            </div>
+
+            <button id="menuBtn" class="lg:hidden p-2 rounded-lg hover:bg-warm transition-colors">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2">
+                    <path d="M3 12h18M3 6h18M3 18h18"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 h-full w-72 bg-cream z-50 shadow-2xl p-8 lg:hidden">
+        <button id="closeMenu" class="absolute top-4 right-4 p-2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+        <div class="flex flex-col gap-6 mt-16">
+            <a href="#problem" class="text-charcoal font-medium text-lg mobile-link">Problem</a>
+            <a href="#pillars" class="text-charcoal font-medium text-lg mobile-link">Solution</a>
+            <a href="#how-it-works" class="text-charcoal font-medium text-lg mobile-link">How It Works</a>
+            <a href="#impact" class="text-charcoal font-medium text-lg mobile-link">Impact</a>
+            <a href="#contact" class="btn-primary px-6 py-3 rounded-full font-semibold text-center mt-4 mobile-link">Get Started</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center pt-24 pb-16 px-6 lg:px-12 overflow-hidden">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="grain"></div>
+        
+        <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="reveal">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest/10 text-forest font-medium text-sm mb-6">
+                    <span class="w-2 h-2 rounded-full bg-forest animate-pulse"></span>
+                    Smart India Hackathon 2026
+                </div>
+                <h1 class="font-heading text-5xl lg:text-7xl font-bold text-charcoal leading-[1.05] mb-6">
+                    Early Detection.<br>
+                    <span class="bg-gradient-to-r from-forest via-forestLight to-terracotta bg-clip-text text-transparent">Better Mobility.</span>
+                </h1>
+                <p class="text-lg text-muted leading-relaxed mb-8 max-w-xl">
+                    A wearable AI-powered system that detects early osteoarthritis in remote areas, 
+                    bringing expert diagnostic capabilities to communities that need it most.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#pillars" class="btn-primary px-8 py-4 rounded-full font-semibold inline-flex items-center gap-2">
+                        Explore Solution
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="#how-it-works" class="btn-secondary px-8 py-4 rounded-full font-semibold">
+                        See How It Works
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-8 mt-12 pt-8 border-t border-charcoal/10">
+                    <div>
+                        <div class="stat-number font-heading text-3xl font-bold text-charcoal" data-target="300">0</div>
+                        <div class="text-sm text-muted mt-1">Million Affected</div>
+                    </div>
+                    <div class="w-px h-12 bg-charcoal/10"></div>
+                    <div>
+                        <div class="stat-number font-heading text-3xl font-bold text-charcoal" data-target="80">0</div>
+                        <div class="text-sm text-muted mt-1">% Undiagnosed Early</div>
+                    </div>
+                    <div class="w-px h-12 bg-charcoal/10"></div>
+                    <div>
+                        <div class="stat-number font-heading text-3xl font-bold text-charcoal" data-target="95">0</div>
+                        <div class="text-sm text-muted mt-1">% AI Accuracy</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Visual -->
+            <div class="reveal-scale relative">
+                <div class="relative w-full aspect-square max-w-lg mx-auto">
+                    <!-- Central device illustration -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-64 h-64 lg:w-80 lg:h-80 rounded-full bg-gradient-to-br from-forest/20 to-terracotta/20 flex items-center justify-center animate-pulse-slow">
+                            <div class="w-48 h-48 lg:w-60 lg:h-60 rounded-full bg-gradient-to-br from-forest/30 to-terracotta/30 flex items-center justify-center">
+                                <div class="w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-white shadow-2xl flex items-center justify-center">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="1.5">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                                        <circle cx="12" cy="12" r="3" fill="#C4643A" stroke="none"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating cards -->
+                    <div class="absolute top-4 right-4 lg:top-8 lg:right-0 bg-white rounded-2xl p-4 shadow-xl animate-float" style="animation-delay: 0s;">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-forest/10 flex items-center justify-center">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="2">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-xs text-muted">Motion Data</div>
+                                <div class="font-semibold text-charcoal text-sm">Live Tracking</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-8 left-0 lg:left-4 bg-white rounded-2xl p-4 shadow-xl animate-float" style="animation-delay: 1.5s;">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-terracotta/10 flex items-center justify-center">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4643A" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                    <path d="M9 9h6v6H9z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-xs text-muted">AI Analysis</div>
+                                <div class="font-semibold text-charcoal text-sm flex items-center">
+                                    <span class="status-dot status-green"></span>
+                                    Low Risk
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-1/2 -left-4 lg:-left-8 bg-white rounded-2xl p-4 shadow-xl animate-float" style="animation-delay: 3s;">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-sand flex items-center justify-center">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-xs text-muted">Health Worker</div>
+                                <div class="font-semibold text-charcoal text-sm">Connected</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted">
+            <span class="text-xs uppercase tracking-widest">Scroll</span>
+            <div class="w-6 h-10 rounded-full border-2 border-muted/40 flex justify-center pt-2">
+                <div class="w-1 h-2 rounded-full bg-muted animate-bounce"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section id="problem" class="py-24 px-6 lg:px-12 bg-warm relative">
+        <div class="grain"></div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-16 reveal">
+                <div class="section-divider mx-auto mb-6"></div>
+                <h2 class="font-heading text-4xl lg:text-5xl font-bold text-charcoal mb-4">The Problem We Solve</h2>
+                <p class="text-muted text-lg max-w-2xl mx-auto">Osteoarthritis silently affects millions, but early detection remains out of reach for rural communities.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="reveal bg-white rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow">
+                    <div class="w-14 h-14 rounded-2xl bg-terracotta/10 flex items-center justify-center mb-6">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C4643A" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 8v4M12 16h.01"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-charcoal mb-3">Late Diagnosis</h3>
+                    <p class="text-muted leading-relaxed">By the time most patients in remote areas receive a diagnosis, the condition has progressed to irreversible stages, requiring costly joint replacements.</p>
+                </div>
+
+                <div class="reveal bg-white rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow" style="transition-delay: 0.1s;">
+                    <div class="w-14 h-14 rounded-2xl bg-forest/10 flex items-center justify-center mb-6">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <path d="M9 22V12h6v10"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-charcoal mb-3">Limited Access</h3>
+                    <p class="text-muted leading-relaxed">Remote villages lack X-ray machines and orthopedic specialists. Patients must travel hundreds of kilometers for basic evaluation.</p>
+                </div>
+
+                <div class="reveal bg-white rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow" style="transition-delay: 0.2s;">
+                    <div class="w-14 h-14 rounded-2xl bg-sand flex items-center justify-center mb-6">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2">
+                            <path d="M12 2v20M2 12h20"/>
+                            <circle cx="12" cy="12" r="10"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-charcoal mb-3">Connectivity Gaps</h3>
+                    <p class="text-muted leading-relaxed">Hilly regions suffer from poor internet connectivity, making cloud-based diagnostic tools unreliable when they're needed most.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Three Pillars Section -->
+    <section id="pillars" class="py-24 px-6 lg:px-12 bg-cream relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <div class="section-divider mx-auto mb-6"></div>
+                <h2 class="font-heading text-4xl lg:text-5xl font-bold text-charcoal mb-4">Our Three-Pillar Solution</h2>
+                <p class="text-muted text-lg max-w-2xl mx-auto">A complete ecosystem combining hardware, software, and artificial intelligence.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Pillar 1: Hardware -->
+                <div class="pillar-card reveal bg-white rounded-3xl p-8 border border-charcoal/5 shadow-sm">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-forest to-forestLight flex items-center justify-center text-white shadow-lg shadow-forest/20">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 5h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2M9 5H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"/>
+                                <path d="M9 5h6v14H9z"/>
+                                <circle cx="12" cy="12" r="2"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-xs uppercase tracking-widest text-forest font-semibold mb-1">Pillar 01</div>
+                            <h3 class="font-heading text-2xl font-bold text-charcoal">Hardware</h3>
+                        </div>
+                    </div>
+                    <p class="text-sm uppercase tracking-widest text-muted mb-2 font-semibold">The Eyes & Ears</p>
+                    <p class="text-muted leading-relaxed mb-6">
+                        A small, battery-powered wearable band equipped with precision motion sensors. 
+                        Wrapped around the patient's knee, it captures movement patterns as they walk.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>Lightweight & portable design</span>
+                        </li>
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>Long-lasting battery power</span>
+                        </li>
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>Wireless data transmission</span>
+                        </li>
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>High-precision motion sensors</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Pillar 2: Software -->
+                <div class="pillar-card reveal bg-white rounded-3xl p-8 border border-charcoal/5 shadow-sm" style="transition-delay: 0.1s;">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-terracotta to-terracottaLight flex items-center justify-center text-white shadow-lg shadow-terracotta/20">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="5" y="2" width="14" height="20" rx="2"/>
+                                <path d="M12 18h.01"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-xs uppercase tracking-widest text-terracotta font-semibold mb-1">Pillar 02</div>
+                            <h3 class="font-heading text-2xl font-bold text-charcoal">Software</h3>
+                        </div>
+                    </div>
+                    <p class="text-sm uppercase tracking-widest text-muted mb-2 font-semibold">The Notebook & Messenger</p>
+                    <p class="text-muted leading-relaxed mb-6">
+                        A mobile app for health workers to record patient data, collect sensor readings, 
+                        and securely store everything locally — even without internet.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>Simple, intuitive interface</span>
+                        </li>
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>Offline-first data storage</span>
+                        </li>
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>Auto-sync when connectivity returns</span>
+                        </li>
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>Secure & encrypted patient records</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Pillar 3: AI/ML -->
+                <div class="pillar-card reveal bg-white rounded-3xl p-8 border border-charcoal/5 shadow-sm" style="transition-delay: 0.2s;">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-charcoal to-charcoal/80 flex items-center justify-center text-white shadow-lg shadow-charcoal/20">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <path d="M12 19v3"/>
+                                <circle cx="12" cy="12" r="4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-xs uppercase tracking-widest text-charcoal font-semibold mb-1">Pillar 03</div>
+                            <h3 class="font-heading text-2xl font-bold text-charcoal">AI / ML</h3>
+                        </div>
+                    </div>
+                    <p class="text-sm uppercase tracking-widest text-muted mb-2 font-semibold">The Doctor's Brain</p>
+                    <p class="text-muted leading-relaxed mb-6">
+                        Trained on thousands of knee movement patterns, our AI analyzes gait data 
+                        and delivers instant risk assessments to guide health workers.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>Instant pattern recognition</span>
+                        </li>
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>Red / Yellow / Green risk alerts</span>
+                        </li>
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>Trained on diverse datasets</span>
+                        </li>
+                        <li class="flex items-start text-sm text-charcoal/80 check-item">
+                            <span>Continuously improving accuracy</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-24 px-6 lg:px-12 bg-charcoal text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-96 h-96 rounded-full bg-forest/20 blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-terracotta/20 blur-3xl"></div>
+        
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-20 reveal">
+                <div class="w-20 h-1 bg-gradient-to-r from-forestLight to-terracottaLight rounded-full mx-auto mb-6"></div>
+                <h2 class="font-heading text-4xl lg:text-5xl font-bold mb-4">How It Works</h2>
+                <p class="text-white/60 text-lg max-w-2xl mx-auto">A seamless workflow from patient assessment to expert diagnosis.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-4 gap-8 relative">
+                <!-- Step 1 -->
+                <div class="reveal text-center relative">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-forest to-forestLight flex items-center justify-center font-heading text-2xl font-bold mb-6 shadow-lg shadow-forest/30">
+                        01
+                    </div>
+                    <h3 class="font-heading text-xl font-bold mb-3">Wear & Walk</h3>
+                    <p class="text-white/60 text-sm leading-relaxed">Health worker places the sensor band on the patient's knee. The patient walks naturally as motion data is captured.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="reveal text-center relative" style="transition-delay: 0.1s;">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-forestLight to-terracotta flex items-center justify-center font-heading text-2xl font-bold mb-6 shadow-lg shadow-terracotta/30">
+                        02
+                    </div>
+                    <h3 class="font-heading text-xl font-bold mb-3">Record Data</h3>
+                    <p class="text-white/60 text-sm leading-relaxed">The app receives sensor data wirelessly. Health worker enters patient details and pain levels into the mobile app.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="reveal text-center relative" style="transition-delay: 0.2s;">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-terracotta to-terracottaLight flex items-center justify-center font-heading text-2xl font-bold mb-6 shadow-lg shadow-terracotta/30">
+                        03
+                    </div>
+                    <h3 class="font-heading text-xl font-bold mb-3">AI Analysis</h3>
+                    <p class="text-white/60 text-sm leading-relaxed">With one tap, the AI compares the patient's gait against thousands of patterns and generates an instant risk assessment.</p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="reveal text-center relative" style="transition-delay: 0.3s;">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-terracottaLight to-sand flex items-center justify-center font-heading text-2xl font-bold mb-6 text-charcoal shadow-lg">
+                        04
+                    </div>
+                    <h3 class="font-heading text-xl font-bold mb-3">Act & Refer</h3>
+                    <p class="text-white/60 text-sm leading-relaxed">Clear risk alerts guide action. High-risk patients are referred to city hospitals for specialist care and X-ray confirmation.</p>
+                </div>
+            </div>
+
+            <!-- AI Risk Demo -->
+            <div class="mt-20 reveal-scale">
+                <div class="bg-white/5 backdrop-blur-sm rounded-3xl p-8 lg:p-12 border border-white/10">
+                    <h3 class="font-heading text-2xl font-bold mb-8 text-center">AI Risk Assessment System</h3>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-forest/50 transition-colors">
+                            <div class="flex items-center mb-4">
+                                <span class="status-dot status-green"></span>
+                                <span class="font-heading font-bold text-lg">Low Risk</span>
+                            </div>
+                            <p class="text-white/60 text-sm mb-4">Healthy knee movement patterns detected. No immediate concern.</p>
+                            <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                                <div class="progress-fill" style="--progress: 25%; background: linear-gradient(90deg, #2D5A3D, #3D7A52);"></div>
+                            </div>
+                            <div class="text-xs text-white/40 mt-2">Monitor & follow-up</div>
+                        </div>
+                        <div class="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-yellow-500/50 transition-colors">
+                            <div class="flex items-center mb-4">
+                                <span class="status-dot status-yellow"></span>
+                                <span class="font-heading font-bold text-lg">Moderate Risk</span>
+                            </div>
+                            <p class="text-white/60 text-sm mb-4">Early signs detected. Recommend lifestyle changes and closer monitoring.</p>
+                            <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                                <div class="progress-fill" style="--progress: 60%; background: linear-gradient(90deg, #D4A017, #E8B830);"></div>
+                            </div>
+                            <div class="text-xs text-white/40 mt-2">Schedule follow-up visit</div>
+                        </div>
+                        <div class="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-terracotta/50 transition-colors">
+                            <div class="flex items-center mb-4">
+                                <span class="status-dot status-red"></span>
+                                <span class="font-heading font-bold text-lg">High Risk</span>
+                            </div>
+                            <p class="text-white/60 text-sm mb-4">Strong indicators of osteoarthritis. Immediate specialist referral needed.</p>
+                            <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                                <div class="progress-fill" style="--progress: 90%; background: linear-gradient(90deg, #C4643A, #D9855A);"></div>
+                            </div>
+                            <div class="text-xs text-white/40 mt-2">Refer to hospital urgently</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Features -->
+    <section class="py-24 px-6 lg:px-12 bg-cream">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="reveal-left">
+                    <div class="section-divider mb-6"></div>
+                    <h2 class="font-heading text-4xl lg:text-5xl font-bold text-charcoal mb-6">Built for Remote Realities</h2>
+                    <p class="text-muted text-lg leading-relaxed mb-8">
+                        Every aspect of OsteoDetect is designed to work where healthcare infrastructure is scarce. 
+                        From offline operation to low-power hardware, we've thought through the challenges.
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-forest/10 flex items-center justify-center flex-shrink-0">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="2">
+                                    <path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.58 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-heading font-bold text-charcoal mb-1">Offline-First Architecture</h4>
+                                <p class="text-muted text-sm">All data stored locally on the device. Syncs automatically when internet becomes available.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-terracotta/10 flex items-center justify-center flex-shrink-0">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C4643A" stroke-width="2">
+                                    <rect x="1" y="6" width="18" height="12" rx="2"/>
+                                    <path d="M23 13v-2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-heading font-bold text-charcoal mb-1">Low-Power Hardware</h4>
+                                <p class="text-muted text-sm">Efficient sensor design ensures weeks of operation on a single charge.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-sand flex items-center justify-center flex-shrink-0">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-heading font-bold text-charcoal mb-1">Secure & Private</h4>
+                                <p class="text-muted text-sm">End-to-end encryption protects patient health information at every stage.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-forest/10 flex items-center justify-center flex-shrink-0">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-heading font-bold text-charcoal mb-1">Health Worker Friendly</h4>
+                                <p class="text-muted text-sm">Simple interface designed for users with varying levels of technical expertise.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right visual -->
+                <div class="reveal-right">
+                    <div class="bg-white rounded-3xl p-8 shadow-xl border border-charcoal/5">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <div class="text-xs uppercase tracking-widest text-muted font-semibold mb-1">Patient Scan</div>
+                                <h4 class="font-heading text-xl font-bold text-charcoal">Live Analysis</h4>
+                            </div>
+                            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-forest/10 text-forest text-sm font-medium">
+                                <span class="w-2 h-2 rounded-full bg-forest animate-pulse"></span>
+                                Processing
+                            </div>
+                        </div>
+
+                        <!-- Gait visualization -->
+                        <div class="bg-warm rounded-2xl p-6 mb-6">
+                            <div class="flex items-end justify-between h-32 gap-1">
+                                <div class="flex-1 bg-forest/30 rounded-t" style="height: 40%;"></div>
+                                <div class="flex-1 bg-forest/40 rounded-t" style="height: 60%;"></div>
+                                <div class="flex-1 bg-forest/50 rounded-t" style="height: 80%;"></div>
+                                <div class="flex-1 bg-forest/60 rounded-t" style="height: 95%;"></div>
+                                <div class="flex-1 bg-forest/70 rounded-t" style="height: 100%;"></div>
+                                <div class="flex-1 bg-forest/60 rounded-t" style="height: 85%;"></div>
+                                <div class="flex-1 bg-forest/50 rounded-t" style="height: 70%;"></div>
+                                <div class="flex-1 bg-forest/40 rounded-t" style="height: 50%;"></div>
+                                <div class="flex-1 bg-forest/30 rounded-t" style="height: 35%;"></div>
+                                <div class="flex-1 bg-forest/20 rounded-t" style="height: 25%;"></div>
+                            </div>
+                            <div class="flex justify-between mt-3 text-xs text-muted">
+                                <span>Heel Strike</span>
+                                <span>Mid Stance</span>
+                                <span>Toe Off</span>
+                            </div>
+                        </div>
+
+                        <!-- Metrics -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-cream rounded-xl p-4">
+                                <div class="text-xs text-muted mb-1">Knee Flexion</div>
+                                <div class="font-heading text-2xl font-bold text-charcoal">128<span class="text-sm text-muted font-normal">°</span></div>
+                            </div>
+                            <div class="bg-cream rounded-xl p-4">
+                                <div class="text-xs text-muted mb-1">Gait Symmetry</div>
+                                <div class="font-heading text-2xl font-bold text-charcoal">87<span class="text-sm text-muted font-normal">%</span></div>
+                            </div>
+                            <div class="bg-cream rounded-xl p-4">
+                                <div class="text-xs text-muted mb-1">Step Length</div>
+                                <div class="font-heading text-2xl font-bold text-charcoal">62<span class="text-sm text-muted font-normal">cm</span></div>
+                            </div>
+                            <div class="bg-cream rounded-xl p-4">
+                                <div class="text-xs text-muted mb-1">Pain Level</div>
+                                <div class="font-heading text-2xl font-bold text-terracotta">4<span class="text-sm text-muted font-normal">/10</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Result -->
+                        <div class="bg-gradient-to-r from-yellow-50 to-yellow-100/50 border border-yellow-200/50 rounded-2xl p-5">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="status-dot status-yellow"></span>
+                                <span class="font-heading font-bold text-charcoal">MODERATE RISK DETECTED</span>
+                            </div>
+                            <p class="text-sm text-charcoal/70">Early signs of joint degeneration. Recommend follow-up with specialist.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section id="impact" class="py-24 px-6 lg:px-12 bg-warm relative overflow-hidden">
+        <div class="grain"></div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-16 reveal">
+                <div class="section-divider mx-auto mb-6"></div>
+                <h2 class="font-heading text-4xl lg:text-5xl font-bold text-charcoal mb-4">Impact & Benefits</h2>
+                <p class="text-muted text-lg max-w-2xl mx-auto">Transforming osteoarthritis care in underserved communities.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                <div class="reveal bg-white rounded-2xl p-6 text-center shadow-sm">
+                    <div class="stat-number font-heading text-4xl lg:text-5xl font-bold text-forest mb-2" data-target="10">0</div>
+                    <div class="text-muted text-sm">x Earlier Detection</div>
+                </div>
+                <div class="reveal bg-white rounded-2xl p-6 text-center shadow-sm" style="transition-delay: 0.05s;">
+                    <div class="stat-number font-heading text-4xl lg:text-5xl font-bold text-terracotta mb-2" data-target="70">0</div>
+                    <div class="text-muted text-sm">% Cost Reduction</div>
+                </div>
+                <div class="reveal bg-white rounded-2xl p-6 text-center shadow-sm" style="transition-delay: 0.1s;">
+                    <div class="stat-number font-heading text-4xl lg:text-5xl font-bold text-charcoal mb-2" data-target="500">0</div>
+                    <div class="text-muted text-sm">+ Villages Reached</div>
+                </div>
+                <div class="reveal bg-white rounded-2xl p-6 text-center shadow-sm" style="transition-delay: 0.15s;">
+                    <div class="stat-number font-heading text-4xl lg:text-5xl font-bold text-forestLight mb-2" data-target="50000">0</div>
+                    <div class="text-muted text-sm">+ Lives Impacted</div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="reveal-left bg-white rounded-3xl p-8 shadow-sm">
+                    <h3 class="font-heading text-2xl font-bold text-charcoal mb-6 flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-xl bg-forest/10 flex items-center justify-center">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </span>
+                        Social Impact
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3 text-charcoal/80">
+                            <span class="w-6 h-6 rounded-full bg-forest/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-forest"></span>
+                            </span>
+                            <span>Early intervention prevents disability and improves quality of life for elderly patients</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-charcoal/80">
+                            <span class="w-6 h-6 rounded-full bg-forest/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-forest"></span>
+                            </span>
+                            <span>Reduces the burden on city hospitals by filtering cases at the village level</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-charcoal/80">
+                            <span class="w-6 h-6 rounded-full bg-forest/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-forest"></span>
+                            </span>
+                            <span>Empowers local health workers with AI-assisted diagnostic capabilities</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-charcoal/80">
+                            <span class="w-6 h-6 rounded-full bg-forest/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-forest"></span>
+                            </span>
+                            <span>Creates awareness about musculoskeletal health in rural communities</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="reveal-right bg-white rounded-3xl p-8 shadow-sm">
+                    <h3 class="font-heading text-2xl font-bold text-charcoal mb-6 flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-xl bg-terracotta/10 flex items-center justify-center">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4643A" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"/>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                        </span>
+                        Economic Benefits
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3 text-charcoal/80">
+                            <span class="w-6 h-6 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+                            </span>
+                            <span>Early treatment costs significantly less than late-stage joint replacement surgery</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-charcoal/80">
+                            <span class="w-6 h-6 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+                            </span>
+                            <span>Reduces travel expenses for patients who would otherwise visit distant hospitals</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-charcoal/80">
+                            <span class="w-6 h-6 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+                            </span>
+                            <span>Prevents loss of productivity by enabling people to remain economically active</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-charcoal/80">
+                            <span class="w-6 h-6 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+                            </span>
+                            <span>Affordable hardware makes the solution scalable across thousands of villages</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="contact" class="py-24 px-6 lg:px-12 bg-gradient-to-br from-forest to-charcoal text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-96 h-96 rounded-full bg-terracotta/20 blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-forestLight/20 blur-3xl"></div>
+        
+        <div class="max-w-4xl mx-auto text-center relative z-10 reveal-scale">
+            <h2 class="font-heading text-4xl lg:text-5xl font-bold mb-6">Ready to Transform Osteoarthritis Care?</h2>
+            <p class="text-white/70 text-lg mb-10 max-w-2xl mx-auto">
+                Join us in bringing early detection technology to the communities that need it most. 
+                Together, we can prevent millions from suffering needlessly.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#" class="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold bg-white text-forest hover:bg-warm transition-all hover:-translate-y-1 shadow-xl">
+                    Partner With Us
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="#" class="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold border-2 border-white/30 text-white hover:bg-white/10 transition-all">
+                    Learn More
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-charcoal text-white/60 py-12 px-6 lg:px-12">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-forest to-terracotta flex items-center justify-center">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </div>
+                        <span class="font-heading font-bold text-xl text-white">OsteoDetect</span>
+                    </div>
+                    <p class="text-sm leading-relaxed max-w-md">
+                        A wearable AI-powered system for early osteoarthritis detection in remote areas. 
+                        Smart India Hackathon 2026 Project.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-heading font-semibold text-white mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#problem" class="hover:text-white transition-colors">Problem</a></li>
+                        <li><a href="#pillars" class="hover:text-white transition-colors">Solution</a></li>
+                        <li><a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a></li>
+                        <li><a href="#impact" class="hover:text-white transition-colors">Impact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-heading font-semibold text-white mb-4">Contact</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li>Smart India Hackathon 2026</li>
+                        <li>Team ID: —</li>
+                        <li>Team Name: —</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
+                <p>&copy; 2026 OsteoDetect. All rights reserved.</p>
+                <p>Built with purpose for Smart India Hackathon</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll reveal animation
+        function reveal() {
+            const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+            
+            reveals.forEach(element => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    element.classList.add('active');
+                }
+            });
+
+            // Progress bar animation
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const windowHeight = window.innerHeight;
+                const elementTop = bar.getBoundingClientRect().top;
+                if (elementTop < windowHeight - 100) {
+                    bar.classList.add('animate');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', reveal);
+        reveal();
+
+        // Navbar scroll effect
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu
+        const menuBtn = document.getElementById('menuBtn');
+        const closeMenu = document.getElementById('closeMenu');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.add('open');
+        });
+
+        closeMenu.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+            });
+        });
+
+        // Number counter animation
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number[data-target]');
+            
+            counters.forEach(counter => {
+                const windowHeight = window.innerHeight;
+                const elementTop = counter.getBoundingClientRect().top;
+                
+                if (elementTop < windowHeight - 100 && !counter.classList.contains('counted')) {
+                    counter.classList.add('counted');
+                    const target = parseInt(counter.getAttribute('data-target'));
+                    const duration = 2000;
+                    const step = target / (duration / 16);
+                    let current = 0;
+                    
+                    const updateCounter = () => {
+                        current += step;
+                        if (current < target) {
+                            counter.textContent = Math.floor(current).toLocaleString();
+                            requestAnimationFrame(updateCounter);
+                        } else {
+                            counter.textContent = target.toLocaleString();
+                        }
+                    };
+                    
+                    updateCounter();
+                }
+            });
+        }
+
+        window.addEventListener('scroll', animateCounters);
+        animateCounters();
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const headerOffset = 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
