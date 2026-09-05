@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OsteoDetect - Early Osteoarthritis Detection</title>
+    <title>Osteo - AI Osteoarthritis Detection</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -128,7 +128,7 @@
         .orb-1 {
             width: 400px;
             height: 400px;
-            background: #C4643A;
+            background: #1A1A1A;
             top: -100px;
             right: -100px;
             animation-delay: 0s;
@@ -137,7 +137,7 @@
         .orb-2 {
             width: 300px;
             height: 300px;
-            background: #2D5A3D;
+            background: #666666;
             bottom: -50px;
             left: -50px;
             animation-delay: 2s;
@@ -146,7 +146,7 @@
         .orb-3 {
             width: 250px;
             height: 250px;
-            background: #D9855A;
+            background: #999999;
             top: 50%;
             left: 30%;
             animation-delay: 4s;
@@ -166,7 +166,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #2D5A3D, #C4643A);
+            background: linear-gradient(90deg, #1A1A1A, #666666);
             transform: scaleX(0);
             transform-origin: left;
             transition: transform 0.5s ease;
@@ -194,7 +194,7 @@
 
         /* Button styles */
         .btn-primary {
-            background: linear-gradient(135deg, #2D5A3D, #3D7A52);
+            background: #1A1A1A;
             color: white;
             transition: all 0.3s ease;
             position: relative;
@@ -225,13 +225,13 @@
         }
 
         .btn-secondary {
-            border: 2px solid #2D5A3D;
-            color: #2D5A3D;
+            border: 2px solid #1A1A1A;
+            color: #1A1A1A;
             transition: all 0.3s ease;
         }
 
         .btn-secondary:hover {
-            background: #2D5A3D;
+            background: #1A1A1A;
             color: white;
             transform: translateY(-2px);
         }
@@ -239,7 +239,7 @@
         /* Progress bar animation */
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #2D5A3D, #C4643A);
+            background: linear-gradient(90deg, #1A1A1A, #666666);
             border-radius: 4px;
             width: 0;
             transition: width 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -260,7 +260,7 @@
         }
 
         .status-green {
-            background: #2D5A3D;
+            background: #1A1A1A;
             box-shadow: 0 0 15px rgba(45, 90, 61, 0.5);
         }
 
@@ -278,7 +278,7 @@
         .connector-line {
             position: absolute;
             height: 2px;
-            background: linear-gradient(90deg, #2D5A3D, #C4643A);
+            background: linear-gradient(90deg, #1A1A1A, #666666);
             top: 50%;
             transform: translateY(-50%);
         }
@@ -314,7 +314,7 @@
         .section-divider {
             width: 80px;
             height: 3px;
-            background: linear-gradient(90deg, #2D5A3D, #C4643A);
+            background: linear-gradient(90deg, #1A1A1A, #666666);
             border-radius: 2px;
         }
 
@@ -350,12 +350,30 @@
     <nav class="navbar fixed top-0 left-0 right-0 z-50 py-4 px-6 lg:px-12">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <a href="#" class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-forest to-terracotta flex items-center justify-center">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                <div class="w-10 h-10 rounded-lg bg-charcoal flex items-center justify-center" style="padding: 4px;">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="12" y="2" width="4" height="4" fill="white"/>
+                        <rect x="8" y="6" width="4" height="4" fill="white"/>
+                        <rect x="16" y="6" width="4" height="4" fill="white"/>
+                        <rect x="12" y="6" width="4" height="4" fill="white"/>
+                        <rect x="4" y="10" width="4" height="4" fill="white"/>
+                        <rect x="8" y="10" width="4" height="4" fill="white"/>
+                        <rect x="12" y="10" width="4" height="4" fill="white"/>
+                        <rect x="16" y="10" width="4" height="4" fill="white"/>
+                        <rect x="20" y="10" width="4" height="4" fill="white"/>
+                        <rect x="24" y="10" width="4" height="4" fill="white"/>
+                        <rect x="4" y="14" width="4" height="4" fill="white"/>
+                        <rect x="12" y="14" width="4" height="4" fill="white"/>
+                        <rect x="20" y="14" width="4" height="4" fill="white"/>
+                        <rect x="8" y="18" width="4" height="4" fill="white"/>
+                        <rect x="12" y="18" width="4" height="4" fill="white"/>
+                        <rect x="16" y="18" width="4" height="4" fill="white"/>
+                        <rect x="12" y="22" width="4" height="4" fill="white"/>
+                        <rect x="8" y="26" width="4" height="4" fill="white"/>
+                        <rect x="16" y="26" width="4" height="4" fill="white"/>
                     </svg>
                 </div>
-                <span class="font-heading font-bold text-xl text-charcoal">OsteoDetect</span>
+                <span class="font-heading font-bold text-xl text-charcoal tracking-tight">Osteo</span>
             </a>
             
             <div class="hidden lg:flex items-center gap-10">
@@ -363,7 +381,7 @@
                 <a href="#pillars" class="text-charcoal/80 hover:text-forest transition-colors font-medium">Solution</a>
                 <a href="#how-it-works" class="text-charcoal/80 hover:text-forest transition-colors font-medium">How It Works</a>
                 <a href="#impact" class="text-charcoal/80 hover:text-forest transition-colors font-medium">Impact</a>
-                <a href="#contact" class="btn-primary px-6 py-2.5 rounded-full font-semibold text-sm">Get Started</a>
+                <a href="#impact" class="btn-primary px-6 py-2.5 rounded-full font-semibold text-sm">See Impact</a>
             </div>
 
             <button id="menuBtn" class="lg:hidden p-2 rounded-lg hover:bg-warm transition-colors">
@@ -386,7 +404,7 @@
             <a href="#pillars" class="text-charcoal font-medium text-lg mobile-link">Solution</a>
             <a href="#how-it-works" class="text-charcoal font-medium text-lg mobile-link">How It Works</a>
             <a href="#impact" class="text-charcoal font-medium text-lg mobile-link">Impact</a>
-            <a href="#contact" class="btn-primary px-6 py-3 rounded-full font-semibold text-center mt-4 mobile-link">Get Started</a>
+            <a href="#impact" class="btn-primary px-6 py-3 rounded-full font-semibold text-center mt-4 mobile-link">See Impact</a>
         </div>
     </div>
 
@@ -399,13 +417,9 @@
         
         <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center relative z-10">
             <div class="reveal">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest/10 text-forest font-medium text-sm mb-6">
-                    <span class="w-2 h-2 rounded-full bg-forest animate-pulse"></span>
-                    Smart India Hackathon 2026
-                </div>
                 <h1 class="font-heading text-5xl lg:text-7xl font-bold text-charcoal leading-[1.05] mb-6">
                     Early Detection.<br>
-                    <span class="bg-gradient-to-r from-forest via-forestLight to-terracotta bg-clip-text text-transparent">Better Mobility.</span>
+                    <span class="bg-gradient-to-r from-charcoal via-charcoal/80 to-charcoal/60 bg-clip-text text-transparent">Better Mobility.</span>
                 </h1>
                 <p class="text-lg text-muted leading-relaxed mb-8 max-w-xl">
                     A wearable AI-powered system that detects early osteoarthritis in remote areas, 
@@ -449,10 +463,10 @@
                         <div class="w-64 h-64 lg:w-80 lg:h-80 rounded-full bg-gradient-to-br from-forest/20 to-terracotta/20 flex items-center justify-center animate-pulse-slow">
                             <div class="w-48 h-48 lg:w-60 lg:h-60 rounded-full bg-gradient-to-br from-forest/30 to-terracotta/30 flex items-center justify-center">
                                 <div class="w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-white shadow-2xl flex items-center justify-center">
-                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="1.5">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="1.5">
                                         <circle cx="12" cy="12" r="10"/>
                                         <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-                                        <circle cx="12" cy="12" r="3" fill="#C4643A" stroke="none"/>
+                                        <circle cx="12" cy="12" r="3" fill="#666666" stroke="none"/>
                                     </svg>
                                 </div>
                             </div>
@@ -463,7 +477,7 @@
                     <div class="absolute top-4 right-4 lg:top-8 lg:right-0 bg-white rounded-2xl p-4 shadow-xl animate-float" style="animation-delay: 0s;">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-forest/10 flex items-center justify-center">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="2">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2">
                                     <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                                 </svg>
                             </div>
@@ -542,7 +556,7 @@
 
                 <div class="reveal bg-white rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow" style="transition-delay: 0.1s;">
                     <div class="w-14 h-14 rounded-2xl bg-forest/10 flex items-center justify-center mb-6">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="2">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2">
                             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                             <path d="M9 22V12h6v10"/>
                         </svg>
@@ -788,14 +802,14 @@
                     <div class="section-divider mb-6"></div>
                     <h2 class="font-heading text-4xl lg:text-5xl font-bold text-charcoal mb-6">Built for Remote Realities</h2>
                     <p class="text-muted text-lg leading-relaxed mb-8">
-                        Every aspect of OsteoDetect is designed to work where healthcare infrastructure is scarce. 
+                        Every aspect of Osteo is designed to work where healthcare infrastructure is scarce. 
                         From offline operation to low-power hardware, we've thought through the challenges.
                     </p>
                     
                     <div class="space-y-6">
                         <div class="flex items-start gap-4">
                             <div class="w-12 h-12 rounded-xl bg-forest/10 flex items-center justify-center flex-shrink-0">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="2">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2">
                                     <path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.58 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/>
                                 </svg>
                             </div>
@@ -832,7 +846,7 @@
 
                         <div class="flex items-start gap-4">
                             <div class="w-12 h-12 rounded-xl bg-forest/10 flex items-center justify-center flex-shrink-0">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="2">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2">
                                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                                     <circle cx="9" cy="7" r="4"/>
                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
@@ -948,7 +962,7 @@
                 <div class="reveal-left bg-white rounded-3xl p-8 shadow-sm">
                     <h3 class="font-heading text-2xl font-bold text-charcoal mb-6 flex items-center gap-3">
                         <span class="w-10 h-10 rounded-xl bg-forest/10 flex items-center justify-center">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" stroke-width="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                             </svg>
                         </span>
@@ -1023,28 +1037,39 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section id="contact" class="py-24 px-6 lg:px-12 bg-gradient-to-br from-forest to-charcoal text-white relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-96 h-96 rounded-full bg-terracotta/20 blur-3xl"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-forestLight/20 blur-3xl"></div>
+    <!-- Closing Section -->
+    <section class="py-24 px-6 lg:px-12 bg-charcoal text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-96 h-96 rounded-full bg-white/5 blur-3xl"></div>
         
         <div class="max-w-4xl mx-auto text-center relative z-10 reveal-scale">
-            <h2 class="font-heading text-4xl lg:text-5xl font-bold mb-6">Ready to Transform Osteoarthritis Care?</h2>
-            <p class="text-white/70 text-lg mb-10 max-w-2xl mx-auto">
-                Join us in bringing early detection technology to the communities that need it most. 
-                Together, we can prevent millions from suffering needlessly.
-            </p>
-            <div class="flex flex-wrap justify-center gap-4">
-                <a href="#" class="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold bg-white text-forest hover:bg-warm transition-all hover:-translate-y-1 shadow-xl">
-                    Partner With Us
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                </a>
-                <a href="#" class="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold border-2 border-white/30 text-white hover:bg-white/10 transition-all">
-                    Learn More
-                </a>
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white mb-8" style="padding: 8px;">
+                <svg width="48" height="48" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="12" y="2" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="8" y="6" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="16" y="6" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="12" y="6" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="4" y="10" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="8" y="10" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="12" y="10" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="16" y="10" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="20" y="10" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="24" y="10" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="4" y="14" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="12" y="14" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="20" y="14" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="8" y="18" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="12" y="18" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="16" y="18" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="12" y="22" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="8" y="26" width="4" height="4" fill="#1A1A1A"/>
+                    <rect x="16" y="26" width="4" height="4" fill="#1A1A1A"/>
+                </svg>
             </div>
+            <h2 class="font-heading text-4xl lg:text-5xl font-bold mb-6">Detect Early. Act Fast.</h2>
+            <p class="text-white/70 text-lg max-w-2xl mx-auto">
+                Bringing expert-level osteoarthritis screening to every village. 
+                Because mobility should never be a luxury.
+            </p>
         </div>
     </section>
 
@@ -1054,12 +1079,30 @@
             <div class="grid md:grid-cols-4 gap-8 mb-8">
                 <div class="md:col-span-2">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-forest to-terracotta flex items-center justify-center">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center" style="padding: 4px;">
+                            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="12" y="2" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="8" y="6" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="16" y="6" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="12" y="6" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="4" y="10" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="8" y="10" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="12" y="10" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="16" y="10" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="20" y="10" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="24" y="10" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="4" y="14" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="12" y="14" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="20" y="14" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="8" y="18" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="12" y="18" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="16" y="18" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="12" y="22" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="8" y="26" width="4" height="4" fill="#1A1A1A"/>
+                                <rect x="16" y="26" width="4" height="4" fill="#1A1A1A"/>
                             </svg>
                         </div>
-                        <span class="font-heading font-bold text-xl text-white">OsteoDetect</span>
+                        <span class="font-heading font-bold text-xl text-white">Osteo</span>
                     </div>
                     <p class="text-sm leading-relaxed max-w-md">
                         A wearable AI-powered system for early osteoarthritis detection in remote areas. 
@@ -1076,17 +1119,17 @@
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-heading font-semibold text-white mb-4">Contact</h4>
+                    <h4 class="font-heading font-semibold text-white mb-4">Project</h4>
                     <ul class="space-y-2 text-sm">
-                        <li>Smart India Hackathon 2026</li>
-                        <li>Team ID: —</li>
-                        <li>Team Name: —</li>
+                        <li>AI-Powered Wearable System</li>
+                        <li>Early Osteoarthritis Detection</li>
+                        <li>Healthcare Technology</li>
                     </ul>
                 </div>
             </div>
             <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
-                <p>&copy; 2026 OsteoDetect. All rights reserved.</p>
-                <p>Built with purpose for Smart India Hackathon</p>
+                <p>&copy; 2026 Osteo. All rights reserved.</p>
+                <p>AI-Powered Osteoarthritis Detection System</p>
             </div>
         </div>
     </footer>
